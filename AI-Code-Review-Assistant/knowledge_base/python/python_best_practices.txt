@@ -1,0 +1,29 @@
+# Python Best Practices & Clean Architecture
+
+## 1. Exception Handling
+- Always catch specific exceptions (e.g., `ValueError`, `KeyError`, `FileNotFoundError`) instead of catching `Exception` or using bare `except:`.
+- Use `try ... except ... else ... finally` correctly:
+  - `try`: Code that could raise the expected error.
+  - `except`: Specific mitigation code.
+  - `else`: Code that runs only if no exception occurred.
+  - `finally`: Cleanup code (closing files, releasing locks, closing db connections).
+- Avoid silent failures like `except Exception: pass`. Always log or handle the error appropriately.
+
+## 2. Resource Management
+- Always use Context Managers (`with` statement) when dealing with I/O, database connections, files, or thread locks.
+- Example:
+  ```python
+  with open("data.json", "r", encoding="utf-8") as f:
+      data = json.load(f)
+  ```
+- Custom context managers can be implemented using `@contextlib.contextmanager` or class `__enter__` and `__exit__`.
+
+## 3. Data Structures & Performance
+- Use list comprehensions, generator expressions, or set comprehensions instead of slow `for` loops with repetitive `.append()`.
+- Use generators (`yield`) for handling large datasets to avoid loading excessive data into memory (O(1) auxiliary space vs O(N)).
+- Use `collections.defaultdict`, `collections.Counter`, and `collections.deque` for specialized high-performance operations.
+- Avoid modifying a list while iterating over it; iterate over a slice copy or use list comprehension.
+
+## 4. Type Annotations & Documentation
+- Use Python 3.10+ type annotations (`int | str`, `list[dict[str, Any]]`) to enhance readability, IDE support, and mypy static analysis.
+- Write docstrings adhering to Google or Sphinx/NumPy styles detailing Parameters, Returns, and Raises.

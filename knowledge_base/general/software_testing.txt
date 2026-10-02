@@ -1,0 +1,16 @@
+# Software Testing Principles & Test-Driven Standards
+
+## 1. Testing Pyramid
+- Unit Tests (70%): Fast, isolated tests for individual functions and classes. Mock external I/O, networks, and databases.
+- Integration Tests (20%): Verify interaction between services, databases, and API routers.
+- End-to-End Tests (10%): Validate critical user flows from UI to storage.
+
+## 2. Test Coverage & Quality
+- Target at least 80% line and branch coverage on core business logic and security components.
+- Do not just test happy paths; explicitly test edge cases: empty strings, null pointers, negative values, boundary thresholds, timeout simulations, and malformed inputs.
+
+## 3. AAA Pattern (Arrange - Act - Assert)
+- Arrange: Set up inputs, mocks, and initial conditions.
+- Act: Execute the method or function under test.
+- Assert: Verify that returned values or side effects match expectations precisely.
+- Keep assertions specific; test only one logical concept per test case.

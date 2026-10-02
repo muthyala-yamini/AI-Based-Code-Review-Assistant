@@ -1,0 +1,20 @@
+# JavaScript & TypeScript Best Practices
+
+## 1. Variable Declarations & Scope
+- Always use `const` by default. Use `let` only when variable reassignment is required.
+- Never use `var` due to function scoping, hoisting quirks, and variable leaking.
+
+## 2. Equality & Type Coercion
+- Always use strict equality (`===` and `!==`) to prevent unintended type coercion bugs (e.g., `0 == ""` evaluates to true).
+- Use TypeScript with strict null checks (`strict: true`) to catch type mismatches during compilation.
+
+## 3. Asynchronous Programming & Error Handling
+- Prefer `async`/`await` over nested Promise `.then()` chains for cleaner, readable flow.
+- Always wrap `await` calls in `try...catch` blocks or attach `.catch()` to handle network or execution rejections.
+- Avoid unhandled promise rejections in Node.js which can terminate process execution.
+- Use `Promise.allSettled()` when querying independent services where failure of one should not abort others.
+
+## 4. Immutability & Modern Functional Patterns
+- Use spread operators (`{ ...obj, key: val }`, `[...arr, item]`) or `structuredClone()` to avoid mutating shared state.
+- Prefer array declarative methods (`.map()`, `.filter()`, `.reduce()`, `.find()`, `.some()`) over manual index-based `for` loops.
+- Use optional chaining (`?.`) and nullish coalescing (`??`) rather than clumsy nested logical AND (`&&`) expressions.

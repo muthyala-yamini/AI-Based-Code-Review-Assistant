@@ -1,0 +1,36 @@
+# Python Security & Secure Coding Standards
+
+## 1. Secrets & Credentials Management
+- NEVER commit secrets, API keys, passwords, database credentials, or tokens in source code or Git repositories.
+- Use environment variables (via `os.getenv` or `python-dotenv`) or secret managers (GCP Secret Manager, HashiCorp Vault, AWS Secrets Manager).
+- Provide a sanitized `.env.example` file with placeholder values for development.
+
+## 2. SQL Injection Prevention
+- NEVER concatenate or format user input directly into SQL strings:
+  ```python
+  # CRITICAL VULNERABILITY:
+  cursor.execute(f"SELECT * FROM users WHERE username = '{username}'")
+  ```
+- ALWAYS use parameterized queries or trusted ORM mappings (SQLAlchemy, Peewee):
+  ```python
+  # SECURE:
+  cursor.execute("SELECT * FROM users WHERE username = ?", (username,))
+  ```
+
+## 3. Remote Code Execution & Unsafe Deserialization
+- Never use `eval()`, `exec()`, or `input()` to evaluate user-supplied strings as code.
+- Avoid using `pickle.loads()` on untrusted input because pickle allows arbitrary object construction and command execution. Use safe serialization formats like JSON, MessagePack, or Protocol Buffers.
+- Use `yaml.safe_load()` instead of `yaml.load()` in PyYAML.
+
+## 4. Command Injection & Subprocess Security
+- When calling system utilities using `subprocess.run` or `subprocess.Popen`, never use `shell=True` with formatted user strings.
+- Pass arguments as an array of discrete arguments:
+  ```python
+  # SECURE:
+  subprocess.run(["ls", "-l", target_directory], check=True)
+  ```
+
+## 5. File System & Path Traversal (LFI)
+- Validate and sanitize file paths received from user requests.
+- Use `os.path.abspath()` and verify that the canonical path starts with the intended base directory using `os.path.commonpath()`.
+- Use `werkzeug.utils.secure_filename()` before saving uploaded files to disk.

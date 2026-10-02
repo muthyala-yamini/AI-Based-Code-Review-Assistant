@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Review Report #{{ review.id }} - AI-Based Code Review Assistant{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-5 py-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <a href="/history" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> History</a>
+                <span class="badge bg-primary-subtle text-primary">{{ review.language }}</span>
+                <span class="small text-secondary">{{ review.created_at }}</span>
+            </div>
+            <h2 class="fw-bold mb-0">Code Review Report: <span class="font-monospace text-primary">{{ review.id }}</span></h2>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="/" class="btn btn-primary fw-semibold"><i class="bi bi-play-circle me-1"></i> New Review</a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Summary & Score -->
+        <div class="col-lg-4">
+            <div class="card bg-surface border-secondary border-opacity-25 rounded-4 p-4 shadow-sm mb-4">
+                <h5 class="fw-bold mb-3">Overall Quality Score</h5>
+                <div class="d-flex align-items-baseline gap-2 mb-3">
+                    <span class="display-3 fw-extrabold {% if review.score >= 80 %}text-success{% elif review.score >= 60 %}text-warning{% else %}text-danger{% endif %}">
+                        {{ review.score }}
+                    </span>
+                    <span class="fs-4 text-secondary">/ 100</span>
+                </div>
+                
+                <div class="list-group list-group-flush bg-transparent">
+                    <div class="list-group-item bg-transparent text-light d-flex justify-content-between px-0">
+                        <span><i class="bi bi-bug me-2 text-danger"></i> Bugs Detected</span>
+                        <span class="badge bg-danger-subtle text-danger">{{ review.bugs_count }}</span>
+                    </div>
+                    <div class="list-group-item bg-transparent text-light d-flex justify-content-between px-0">
+                        <span><i class="bi bi-shield-slash me-2 text-warning"></i> Security Vulnerabilities</span>
+                        <span class="badge bg-warning-subtle text-warning">{{ review.security_count }}</span>
+                    </div>
+                    <div class="list-group-item bg-transparent text-light d-flex justify-content-between px-0">
+                        <span><i class="bi bi-lightning-charge me-2 text-info"></i> Performance Issues</span>
+                        <span class="badge bg-info-subtle text-info">{{ review.performance_count }}</span>
+                    </div>
+                    <div class="list-group-item bg-transparent text-light d-flex justify-content-between px-0">
+                        <span><i class="bi bi-check2-circle me-2 text-success"></i> Quality Violations</span>
+                        <span class="badge bg-success-subtle text-success">{{ review.quality_count }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card bg-surface border-secondary border-opacity-25 rounded-4 p-4 shadow-sm">
+                <h6 class="fw-bold mb-2">Executive Summary</h6>
+                <p class="text-secondary small mb-0">{{ review.summary }}</p>
+            </div>
+        </div>
+
+        <!-- Code & Details -->
+        <div class="col-lg-8">
+            <div class="card bg-surface border-secondary border-opacity-25 rounded-4 p-4 shadow-sm mb-4">
+                <h5 class="fw-bold mb-3"><i class="bi bi-code me-2 text-primary"></i> Original Submitted Code</h5>
+                <div class="bg-dark p-3 rounded-3 border border-secondary border-opacity-25 overflow-x-auto" style="max-height: 350px;">
+                    <pre class="mb-0"><code class="font-monospace text-light small">{{ review.code }}</code></pre>
+                </div>
+            </div>
+
+            <div class="card bg-surface border-secondary border-opacity-25 rounded-4 p-4 shadow-sm">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0"><i class="bi bi-magic me-2 text-success"></i> AI Improved Code</h5>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="navigator.clipboard.writeText(document.getElementById('improvedCodeArea').innerText)">
+                        <i class="bi bi-clipboard me-1"></i> Copy
+                    </button>
+                </div>
+                <div class="bg-dark p-3 rounded-3 border border-secondary border-opacity-25 overflow-x-auto" style="max-height: 400px;">
+                    <pre class="mb-0"><code id="improvedCodeArea" class="font-monospace text-light small">{{ review.improved_code }}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

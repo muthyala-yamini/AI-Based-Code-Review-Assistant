@@ -1,0 +1,329 @@
+{% extends "base.html" %}
+
+{% block title %}AI-Based Code Review Assistant - Home Workspace{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-5 py-4">
+
+    <!-- Hero Section -->
+    <section class="hero-section text-center py-4 mb-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-9">
+                <span class="badge bg-primary-subtle text-primary border border-primary border-opacity-25 px-3 py-1 mb-3 rounded-pill">
+                    <i class="bi bi-stars me-1"></i> Multi-Agent Architecture · RAG Augmented · Gemini 3.8 Flash
+                </span>
+                <h1 class="display-5 fw-extrabold mb-3">
+                    Review Code. <br class="d-none d-md-inline">
+                    <span class="gradient-text">Build Better Software.</span>
+                </h1>
+                <p class="lead text-secondary mb-4 mx-auto" style="max-width: 720px;">
+                    An intelligent multi-agent AI platform that detects bugs, security vulnerabilities, performance bottlenecks, and coding-standard violations using LangGraph and FAISS knowledge retrieval.
+                </p>
+                <div class="d-flex flex-wrap justify-content-center gap-3 mb-4">
+                    <a href="#workspace" class="btn btn-primary btn-lg px-4 fw-semibold shadow-glow">
+                        <i class="bi bi-play-circle me-2"></i> Start Code Review
+                    </a>
+                    <button type="button" class="btn btn-outline-light btn-lg px-4 fw-semibold" onclick="document.getElementById('fileUploadInput').click()">
+                        <i class="bi bi-cloud-arrow-up me-2"></i> Upload Code
+                    </button>
+                    <input type="file" id="fileUploadInput" class="d-none" accept=".py,.js,.java,.cpp,.c,.html,.css,.ts,.sql" onchange="handleFileUpload(event)">
+                </div>
+
+                <!-- Statistics Bar -->
+                <div class="row g-3 justify-content-center text-start mt-2">
+                    <div class="col-6 col-md-3">
+                        <div class="stat-pill p-3 rounded-4 border border-secondary border-opacity-25 bg-surface">
+                            <div class="text-primary fw-bold fs-4">5 Specialized</div>
+                            <div class="text-secondary small">Autonomous AI Agents</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="stat-pill p-3 rounded-4 border border-secondary border-opacity-25 bg-surface">
+                            <div class="text-info fw-bold fs-4">FAISS RAG</div>
+                            <div class="text-secondary small">Standards Knowledge Base</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="stat-pill p-3 rounded-4 border border-secondary border-opacity-25 bg-surface">
+                            <div class="text-success fw-bold fs-4">Gemini 3.8</div>
+                            <div class="text-secondary small">Real-Time Reasoning</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="stat-pill p-3 rounded-4 border border-secondary border-opacity-25 bg-surface">
+                            <div class="text-warning fw-bold fs-4">Zero-Trust</div>
+                            <div class="text-secondary small">Static Code Sandboxing</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Workspace Section -->
+    <section id="workspace" class="workspace-section">
+        <div class="row g-4">
+            
+            <!-- LEFT PANEL: Source Code Editor -->
+            <div class="col-lg-6">
+                <div class="card bg-surface border-secondary border-opacity-25 h-100 shadow-sm rounded-4 overflow-hidden">
+                    <div class="card-header bg-dark-subtle border-bottom border-secondary border-opacity-25 py-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-file-earmark-code text-primary fs-5"></i>
+                            <span class="fw-bold">Source Code</span>
+                            <span id="fileNameBadge" class="badge bg-secondary-subtle text-secondary small d-none"></span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <label for="languageSelect" class="small text-secondary me-1">Language:</label>
+                            <select id="languageSelect" class="form-select form-select-sm bg-dark text-light border-secondary w-auto">
+                                <option value="Python" selected>Python</option>
+                                <option value="JavaScript">JavaScript</option>
+                                <option value="TypeScript">TypeScript</option>
+                                <option value="Java">Java</option>
+                                <option value="C++">C++</option>
+                                <option value="C">C</option>
+                                <option value="SQL">SQL</option>
+                                <option value="HTML">HTML</option>
+                                <option value="CSS">CSS</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="card-body p-0 position-relative d-flex flex-column" style="min-height: 480px;">
+                        <textarea id="codeEditor" class="code-textarea flex-grow-1 p-3 font-monospace" placeholder="Paste your code here, load demo code, or upload a source file..."></textarea>
+                    </div>
+                    <div class="card-footer bg-dark-subtle border-top border-secondary border-opacity-25 py-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="document.getElementById('fileUploadInput').click()">
+                                <i class="bi bi-upload me-1"></i> Upload
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="clearEditor()">
+                                <i class="bi bi-trash3 me-1"></i> Clear
+                            </button>
+                            <button type="button" class="btn btn-outline-info btn-sm" onclick="loadDemoCode()">
+                                <i class="bi bi-magic me-1"></i> Load Demo Code
+                            </button>
+                        </div>
+                        <button type="button" id="analyzeBtn" class="btn btn-primary px-4 fw-semibold shadow-glow" onclick="startReview()">
+                            <i class="bi bi-cpu me-2"></i> Analyze Code
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT PANEL: AI Review & Agent Activity -->
+            <div class="col-lg-6">
+                <div class="card bg-surface border-secondary border-opacity-25 h-100 shadow-sm rounded-4 overflow-hidden d-flex flex-column">
+                    <div class="card-header bg-dark-subtle border-bottom border-secondary border-opacity-25 py-3 d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-robot text-primary fs-5"></i>
+                            <span class="fw-bold">AI Review Output</span>
+                        </div>
+                        <div id="reviewStatusPill" class="badge bg-secondary-subtle text-secondary small">
+                            Awaiting Code Input
+                        </div>
+                    </div>
+                    
+                    <div class="card-body p-3 p-lg-4 flex-grow-1 overflow-y-auto" id="reviewOutputBody" style="max-height: 750px;">
+                        <!-- Initial Placeholder -->
+                        <div id="placeholderState" class="text-center py-5 my-5">
+                            <div class="empty-icon-wrap mx-auto mb-3">
+                                <i class="bi bi-search text-secondary display-4"></i>
+                            </div>
+                            <h5 class="fw-bold text-light">Your AI review will appear here</h5>
+                            <p class="text-secondary small mx-auto" style="max-width: 400px;">
+                                Paste your code or click "Load Demo Code" on the left, then click "Analyze Code" to activate the 5 autonomous agents.
+                            </p>
+                        </div>
+
+                        <!-- Agentic AI Activity Live Tracker -->
+                        <div id="agentActivitySection" class="agent-activity-box p-3 mb-4 rounded-3 border border-secondary border-opacity-25 bg-dark-subtle d-none">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="fw-bold small text-uppercase tracking-wider text-primary">
+                                    <i class="bi bi-diagram-3-fill me-1"></i> AI Agent Workflow
+                                </span>
+                                <span id="agentOverallStatus" class="badge bg-primary-subtle text-primary small">In Progress</span>
+                            </div>
+                            <div class="agent-step-list d-flex flex-column gap-2" id="agentStepList">
+                                <!-- Steps dynamically injected -->
+                            </div>
+                        </div>
+
+                        <!-- Review Results View (Hidden Initially) -->
+                        <div id="reviewResultsSection" class="d-none">
+                            
+                            <!-- Score Card & Metrics -->
+                            <div class="overall-quality-banner p-3 p-lg-4 rounded-4 mb-4 border border-secondary border-opacity-25 bg-gradient-card">
+                                <div class="row align-items-center g-3">
+                                    <div class="col-sm-5 text-center text-sm-start">
+                                        <div class="text-secondary small text-uppercase fw-bold">Overall Code Quality</div>
+                                        <div class="d-flex align-items-baseline gap-2 justify-content-center justify-content-sm-start">
+                                            <span class="display-4 fw-extrabold" id="overallScoreVal">--</span>
+                                            <span class="fs-5 text-secondary">/ 100</span>
+                                        </div>
+                                        <div id="scoreGradeBadge" class="badge bg-success-subtle text-success px-2 py-1 mt-1">Excellent</div>
+                                    </div>
+                                    <div class="col-sm-7">
+                                        <div class="row g-2 text-center">
+                                            <div class="col-3">
+                                                <div class="p-2 rounded-3 bg-dark border border-secondary border-opacity-25">
+                                                    <div class="fs-5 fw-bold text-danger" id="bugsCountVal">0</div>
+                                                    <div class="small text-secondary" style="font-size: 0.75rem;">Bugs</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-3">
+                                                <div class="p-2 rounded-3 bg-dark border border-secondary border-opacity-25">
+                                                    <div class="fs-5 fw-bold text-warning" id="secCountVal">0</div>
+                                                    <div class="small text-secondary" style="font-size: 0.75rem;">Security</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-3">
+                                                <div class="p-2 rounded-3 bg-dark border border-secondary border-opacity-25">
+                                                    <div class="fs-5 fw-bold text-info" id="perfCountVal">0</div>
+                                                    <div class="small text-secondary" style="font-size: 0.75rem;">Perf</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-3">
+                                                <div class="p-2 rounded-3 bg-dark border border-secondary border-opacity-25">
+                                                    <div class="fs-5 fw-bold text-success" id="suggCountVal">0</div>
+                                                    <div class="small text-secondary" style="font-size: 0.75rem;">Quality</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Executive Summary -->
+                            <div class="mb-4">
+                                <h6 class="fw-bold mb-2 text-light"><i class="bi bi-info-circle me-1 text-primary"></i> Executive Summary</h6>
+                                <p id="executiveSummaryText" class="text-secondary small leading-relaxed bg-dark p-3 rounded-3 border border-secondary border-opacity-25"></p>
+                            </div>
+
+                            <!-- RAG Knowledge Used -->
+                            <div class="mb-4">
+                                <h6 class="fw-bold mb-2 text-light"><i class="bi bi-layers-half me-1 text-info"></i> Knowledge Used (RAG Retrieved)</h6>
+                                <div id="ragUsedContainer" class="d-flex flex-column gap-2">
+                                    <!-- Dynamic RAG cards -->
+                                </div>
+                            </div>
+
+                            <!-- Detailed Issues Accordion / Tabs -->
+                            <div class="mb-4">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h6 class="fw-bold mb-0 text-light"><i class="bi bi-exclamation-triangle me-1 text-warning"></i> Detailed Issues & Fixes</h6>
+                                    <span class="small text-secondary" id="totalIssuesCount">0 findings</span>
+                                </div>
+                                
+                                <div class="issues-list d-flex flex-column gap-3" id="detailedIssuesList">
+                                    <!-- Dynamic issue cards -->
+                                </div>
+                            </div>
+
+                            <!-- AI Recommendations -->
+                            <div class="mb-4">
+                                <h6 class="fw-bold mb-2 text-light"><i class="bi bi-lightbulb me-1 text-warning"></i> AI Recommendations</h6>
+                                <div class="p-3 bg-dark rounded-3 border border-secondary border-opacity-25">
+                                    <ul id="recommendationsList" class="mb-0 ps-3 small text-secondary d-flex flex-column gap-2">
+                                        <!-- Dynamic items -->
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- Original vs Improved Code Diff -->
+                            <div class="mb-4">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h6 class="fw-bold mb-0 text-light"><i class="bi bi-code-square me-1 text-success"></i> Original vs AI Improved Code</h6>
+                                    <div class="btn-group btn-group-sm">
+                                        <button class="btn btn-outline-secondary" onclick="copyImprovedCode()"><i class="bi bi-clipboard me-1"></i> Copy</button>
+                                        <button class="btn btn-outline-secondary" onclick="downloadImprovedCode()"><i class="bi bi-download me-1"></i> Download</button>
+                                    </div>
+                                </div>
+                                <div class="improved-code-box bg-dark p-3 rounded-3 border border-secondary border-opacity-25 overflow-x-auto">
+                                    <pre class="mb-0"><code id="improvedCodeBlock" class="font-monospace text-light small"></code></pre>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Real-Time Latency & Performance Dashboard Section (Chart.js) -->
+    <section class="latency-section mt-4 mb-5">
+        <div class="card bg-surface border-secondary border-opacity-25 rounded-4 shadow-sm p-4">
+            <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 pb-3 border-bottom border-secondary border-opacity-25 gap-2">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="brand-icon" style="width: 32px; height: 32px; font-size: 14px;"><i class="bi bi-speedometer2"></i></span>
+                    <div>
+                        <h5 class="fw-bold mb-0 text-light d-flex align-items-center gap-2">
+                            <span>Latency & Performance Telemetry</span>
+                            <span class="badge bg-primary-subtle text-primary small">Chart.js Live</span>
+                        </h5>
+                        <div class="text-secondary small">Real-time processing duration measured across the 5 LangGraph autonomous agents</div>
+                    </div>
+                </div>
+                <div class="btn-group btn-group-sm" role="group">
+                    <button type="button" class="btn btn-outline-secondary active" id="btnBarChart" onclick="switchChartMode('bar')">
+                        <i class="bi bi-bar-chart-line me-1"></i> Horizontal Bars
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" id="btnDoughnutChart" onclick="switchChartMode('doughnut')">
+                        <i class="bi bi-pie-chart me-1"></i> Distribution
+                    </button>
+                </div>
+            </div>
+
+            <!-- Telemetry Stat Cards -->
+            <div class="row g-3 mb-4">
+                <div class="col-6 col-md-3">
+                    <div class="p-3 rounded-3 bg-dark border border-secondary border-opacity-25">
+                        <div class="text-secondary small d-flex justify-content-between">
+                            <span>Total Latency</span>
+                            <span class="text-success small">⚡ Fast</span>
+                        </div>
+                        <div class="fs-4 fw-bold text-primary font-monospace" id="totalLatencyVal">1.32s</div>
+                        <div class="text-secondary small" style="font-size: 0.72rem;" id="totalMsVal">1318 ms round-trip</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="p-3 rounded-3 bg-dark border border-secondary border-opacity-25">
+                        <div class="text-secondary small d-flex justify-content-between">
+                            <span>Fastest Agent</span>
+                            <span class="text-success small">FAISS</span>
+                        </div>
+                        <div class="fs-6 fw-bold text-light truncate" id="fastestAgentName">RAG Vector Search</div>
+                        <div class="text-success small font-monospace" id="fastestAgentMs">68 ms</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="p-3 rounded-3 bg-dark border border-secondary border-opacity-25">
+                        <div class="text-secondary small d-flex justify-content-between">
+                            <span>Heaviest Step</span>
+                            <span class="text-warning small">LLM</span>
+                        </div>
+                        <div class="fs-6 fw-bold text-light truncate" id="heaviestAgentName">Review Orchestrator</div>
+                        <div class="text-warning small font-monospace" id="heaviestAgentMs">640 ms</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="p-3 rounded-3 bg-dark border border-secondary border-opacity-25">
+                        <div class="text-secondary small d-flex justify-content-between">
+                            <span>Pipeline Mode</span>
+                            <span class="text-info small">LangGraph</span>
+                        </div>
+                        <div class="fs-6 fw-bold text-light">5 Agents</div>
+                        <div class="text-secondary small" style="font-size: 0.72rem;">StateGraph Orchestrated</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Canvas Container -->
+            <div class="chart-canvas-container bg-dark-subtle p-3 rounded-3 border border-secondary border-opacity-25" style="position: relative; height: 280px; width: 100%;">
+                <canvas id="agentLatencyChart"></canvas>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

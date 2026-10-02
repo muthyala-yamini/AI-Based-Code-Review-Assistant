@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block title %}Architecture & About - AI-Based Code Review Assistant{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-5 py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            
+            <div class="text-center mb-5">
+                <span class="badge bg-primary-subtle text-primary border border-primary border-opacity-25 px-3 py-1 mb-2 rounded-pill">
+                    System Architecture & Design Specification
+                </span>
+                <h2 class="display-6 fw-bold mb-2">AI-Based Code Review Assistant</h2>
+                <p class="text-secondary lead mx-auto" style="max-width: 650px;">
+                    Comprehensive breakdown of the multi-agent workflow, RAG embedding pipeline, and Gemini reasoning engine.
+                </p>
+            </div>
+
+            <!-- Visual Architecture Diagram in HTML/CSS -->
+            <div class="card bg-surface border-secondary border-opacity-25 rounded-4 p-4 shadow-sm mb-5">
+                <h5 class="fw-bold mb-4 text-center"><i class="bi bi-diagram-3 text-primary me-2"></i> Multi-Agent Orchestration Workflow</h5>
+                
+                <div class="workflow-diagram d-flex flex-column align-items-center gap-3">
+                    
+                    <!-- Stage 1 -->
+                    <div class="diagram-node p-3 rounded-3 bg-dark border border-secondary border-opacity-50 text-center" style="max-width: 380px; width: 100%;">
+                        <div class="badge bg-secondary-subtle text-secondary small mb-1">Input Source</div>
+                        <div class="fw-bold"><i class="bi bi-file-code me-1 text-primary"></i> Source Code Input</div>
+                        <div class="text-secondary small">Uploaded file / editor text (Python, JS, Java, C++, etc.)</div>
+                    </div>
+
+                    <div class="diagram-arrow text-secondary"><i class="bi bi-arrow-down fs-4"></i></div>
+
+                    <!-- Stage 2: LangGraph Orchestrator -->
+                    <div class="diagram-node p-3 rounded-4 bg-primary bg-opacity-10 border border-primary border-opacity-50 text-center" style="max-width: 440px; width: 100%;">
+                        <div class="badge bg-primary text-light small mb-1">State Graph Orchestrator</div>
+                        <div class="fw-bold fs-5 text-light">LangGraph State Machine</div>
+                        <div class="text-secondary small">Maintains shared typed state: CodeReviewState</div>
+                    </div>
+
+                    <div class="diagram-arrow text-secondary"><i class="bi bi-arrow-down fs-4"></i></div>
+
+                    <!-- Stage 3: Parallel Specialists -->
+                    <div class="row g-3 w-100 justify-content-center">
+                        <div class="col-md-4">
+                            <div class="diagram-node p-3 rounded-3 bg-dark border border-danger border-opacity-50 text-center h-100">
+                                <div class="badge bg-danger-subtle text-danger small mb-1">Agent 1</div>
+                                <div class="fw-bold text-light">Code Analyzer Agent</div>
+                                <div class="text-secondary small mt-1">Parses AST, verifies syntax, discovers logic bugs & infinite loops.</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="diagram-node p-3 rounded-3 bg-dark border border-warning border-opacity-50 text-center h-100">
+                                <div class="badge bg-warning-subtle text-warning small mb-1">Agent 2</div>
+                                <div class="fw-bold text-light">Security Agent</div>
+                                <div class="text-secondary small mt-1">Scans OWASP Top 10, SQLi, hardcoded credentials & injection risks.</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="diagram-node p-3 rounded-3 bg-dark border border-info border-opacity-50 text-center h-100">
+                                <div class="badge bg-info-subtle text-info small mb-1">Agent 3</div>
+                                <div class="fw-bold text-light">Quality & Perf Agent</div>
+                                <div class="text-secondary small mt-1">Evaluates O(N) complexity, memory efficiency & clean code rules.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="diagram-arrow text-secondary"><i class="bi bi-arrow-down fs-4"></i></div>
+
+                    <!-- Stage 4: RAG Agent -->
+                    <div class="diagram-node p-3 rounded-3 bg-dark border border-success border-opacity-50 text-center" style="max-width: 480px; width: 100%;">
+                        <div class="badge bg-success-subtle text-success small mb-1">Agent 4 (RAG)</div>
+                        <div class="fw-bold text-light"><i class="bi bi-search me-1 text-success"></i> FAISS Vector Knowledge Agent</div>
+                        <div class="text-secondary small">Performs semantic similarity lookup over PEP 8 & OWASP vector store; returns grounded citations with relevance scores.</div>
+                    </div>
+
+                    <div class="diagram-arrow text-secondary"><i class="bi bi-arrow-down fs-4"></i></div>
+
+                    <!-- Stage 5: Final Review Orchestrator -->
+                    <div class="diagram-node p-3 rounded-4 bg-gradient-card border border-primary text-center" style="max-width: 520px; width: 100%;">
+                        <div class="badge bg-primary text-light small mb-1">Agent 5 (Lead)</div>
+                        <div class="fw-bold fs-5 text-light">Review Orchestrator & Code Synthesizer</div>
+                        <div class="text-secondary small mt-1">
+                            Deduplicates issues, computes composite 0-100 score, generates recommendations, and produces pristine improved code.
+                        </div>
+                    </div>
+
+                    <div class="diagram-arrow text-secondary"><i class="bi bi-arrow-down fs-4"></i></div>
+
+                    <!-- Stage 6: UI Presentation -->
+                    <div class="diagram-node p-3 rounded-3 bg-dark border border-secondary border-opacity-50 text-center" style="max-width: 380px; width: 100%;">
+                        <div class="badge bg-secondary-subtle text-secondary small mb-1">Presentation</div>
+                        <div class="fw-bold text-light">Split-Screen UI Dashboard</div>
+                        <div class="text-secondary small">Side-by-side diff, badge counts, and SQLite history persistence</div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Project Credits & Student Info -->
+            <div class="card bg-surface border-secondary border-opacity-25 rounded-4 p-4 shadow-sm">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h5 class="fw-bold mb-1">Academic Project Information</h5>
+                        <p class="text-secondary small mb-3">
+                            Developed as a final-year B.Tech Capstone Project demonstrating modern generative AI engineering, agentic choreography, and retrieval-augmented generation.
+                        </p>
+                        <div class="d-flex flex-wrap gap-4 text-secondary small">
+                            <div><strong class="text-light">Developer:</strong> MUTHYALA YAMINI</div>
+                            <div><strong class="text-light">Technology:</strong> Python, Flask, LangGraph, FAISS, Gemini 3.8 Flash, Bootstrap 5</div>
+                            <div><strong class="text-light">Database:</strong> SQLite3</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                        <span class="badge bg-primary-subtle text-primary p-3 rounded-4 text-center">
+                            <i class="bi bi-mortarboard fs-3 d-block mb-1"></i>
+                            Final Year B.Tech Project
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Review History - AI-Based Code Review Assistant{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-5 py-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+        <div>
+            <h2 class="fw-bold mb-1"><i class="bi bi-clock-history me-2 text-primary"></i> Review History</h2>
+            <p class="text-secondary small mb-0">Browse past code reviews, quality scores, and security audits stored in SQLite.</p>
+        </div>
+        <a href="/" class="btn btn-primary fw-semibold">
+            <i class="bi bi-plus-lg me-1"></i> New Code Review
+        </a>
+    </div>
+
+    <div class="card bg-surface border-secondary border-opacity-25 rounded-4 shadow-sm overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-dark table-hover align-middle mb-0">
+                <thead class="table-dark text-secondary small text-uppercase">
+                    <tr>
+                        <th class="ps-4">Date & Time</th>
+                        <th>Language</th>
+                        <th>Overall Score</th>
+                        <th>Bugs</th>
+                        <th>Security</th>
+                        <th>Performance</th>
+                        <th>Summary</th>
+                        <th class="text-end pe-4">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if reviews and reviews|length > 0 %}
+                        {% for r in reviews %}
+                        <tr>
+                            <td class="ps-4 small text-secondary">
+                                <i class="bi bi-calendar3 me-1"></i> {{ r.created_at }}
+                            </td>
+                            <td>
+                                <span class="badge bg-secondary-subtle text-light border border-secondary border-opacity-25 px-2 py-1">
+                                    {{ r.language }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="fw-bold fs-6 {% if r.score >= 80 %}text-success{% elif r.score >= 60 %}text-warning{% else %}text-danger{% endif %}">
+                                    {{ r.score }} / 100
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge bg-danger-subtle text-danger">{{ r.bugs_count }}</span>
+                            </td>
+                            <td>
+                                <span class="badge bg-warning-subtle text-warning">{{ r.security_count }}</span>
+                            </td>
+                            <td>
+                                <span class="badge bg-info-subtle text-info">{{ r.performance_count }}</span>
+                            </td>
+                            <td class="small text-secondary text-truncate" style="max-width: 280px;">
+                                {{ r.summary or 'Analysis completed.' }}
+                            </td>
+                            <td class="text-end pe-4">
+                                <a href="/review/{{ r.id }}" class="btn btn-sm btn-outline-primary me-1" title="View Review Details">
+                                    <i class="bi bi-eye"></i> View
+                                </a>
+                                <button class="btn btn-sm btn-outline-danger" onclick="deleteHistoricalReview('{{ r.id }}')" title="Delete Review">
+                                    <i class="bi bi-trash3"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="8" class="text-center py-5 text-secondary">
+                                <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+                                No code reviews saved in history yet. Run your first review on the Dashboard!
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

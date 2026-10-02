@@ -1,0 +1,19 @@
+# Java Best Practices & Clean Coding Standards
+
+## 1. Object-Oriented Principles
+- Follow SOLID principles (Single Responsibility, Open/Closed, Liskov Substitution, Interface Segregation, Dependency Inversion).
+- Prefer composition over inheritance. Use interface-based programming.
+- Favor immutability: declare variables and fields `final` wherever possible. Use Java Records for pure data-holding objects.
+
+## 2. Null Safety & Optional
+- Avoid returning `null` from methods; return `Optional<T>` for potentially missing scalar values or empty collections (`Collections.emptyList()`).
+- Avoid calling `.get()` on an `Optional` without checking `.isPresent()`. Prefer `.orElse()`, `.orElseGet()`, or `.orElseThrow()`.
+- Use `@NonNull` and `@Nullable` annotations to make method contracts explicit.
+
+## 3. Concurrency & Performance
+- Use `java.util.concurrent` utilities (`ExecutorService`, `ConcurrentHashMap`, `CompletableFuture`, `AtomicInteger`) instead of manual thread synchronization or raw `wait()`/`notify()`.
+- Use `StringBuilder` for string concatenation inside loops instead of the `+` operator which creates unnecessary intermediate `String` objects.
+- Use streams thoughtfully: avoid heavy or side-effecting operations inside stream pipelines. Use primitive streams (`IntStream`) to eliminate boxing overhead.
+
+## 4. Resource Management (Try-With-Resources)
+- Always manage `AutoCloseable` resources (Streams, Database Connections, Sockets) using the `try-with-resources` statement to prevent resource leaks.

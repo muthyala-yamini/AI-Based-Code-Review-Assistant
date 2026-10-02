@@ -1,0 +1,28 @@
+# PEP 8 - Style Guide for Python Code (Essential Standards)
+
+## Naming Conventions
+- Variables and functions: lowercase_with_underscores (snake_case), e.g., `calculate_tax()`, `user_id`.
+- Classes: CamelCase (CapWords), e.g., `UserProfile`, `ReviewOrchestrator`.
+- Constants: UPPER_CASE_WITH_UNDERSCORES, e.g., `MAX_RETRIES`, `DEFAULT_TIMEOUT`.
+- Protected instance attributes: _single_leading_underscore, e.g., `_internal_cache`.
+- Private instance attributes: __double_leading_underscore (name mangling).
+
+## Code Layout & Indentation
+- Use 4 spaces per indentation level. Never mix tabs and spaces.
+- Maximum line length is 79 characters for code, 72 characters for docstrings and comments.
+- Blank lines: Two blank lines between top-level functions and class definitions; single blank line between method definitions inside a class.
+- Imports should usually be on separate lines, grouped in this order:
+  1. Standard library imports
+  2. Related third-party imports
+  3. Local application/library-specific imports
+
+## Whitespace in Expressions and Statements
+- Avoid extraneous whitespace immediately inside parentheses, brackets, or braces.
+- Always surround binary operators with a single space on either side: assignment (`=`), augmented assignment (`+=`), comparisons (`==`, `<`, `>`, `!=`), booleans (`and`, `or`, `not`).
+- Don't use spaces around the `=` sign when used to indicate a keyword argument or default parameter value.
+
+## Programming Recommendations
+- Code should be written in a way that does not disadvantage other implementations of Python (PyPy, Jython, IronPython).
+- Comparisons to singletons like `None` should always be done with `is` or `is not`, never the equality operators (`==`, `!=`).
+- Use `is not` operator rather than `not ... is`.
+- When catching exceptions, mention specific exceptions whenever possible instead of using a bare `except:`. A bare `except:` clause will catch SystemExit and KeyboardInterrupt exceptions, making it harder to interrupt a program with Control-C.

@@ -1,0 +1,6 @@
+{
+  "name": "AI Code Review Assistant",
+  "description": "An intelligent multi-agent AI platform that detects bugs, security vulnerabilities, performance issues, and coding standards using Gemini, LangGraph, and RAG.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

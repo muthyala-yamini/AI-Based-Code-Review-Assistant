@@ -1,0 +1,20 @@
+# JavaScript & Node.js Security Best Practices
+
+## 1. Cross-Site Scripting (XSS) Prevention
+- Never assign untrusted user data to `element.innerHTML`, `outerHTML`, or `document.write()`.
+- Use `element.textContent` or framework templating engines (e.g. React JSX `{variable}`) that automatically escape HTML entities.
+- Sanitize rich HTML input using a battle-tested library like DOMPurify before rendering.
+- Implement a Content Security Policy (CSP) header prohibiting `unsafe-inline` scripts.
+
+## 2. Injection Vulnerabilities (NoSQL, SQL, OS Command)
+- Avoid `child_process.exec()` with user-controlled input; use `child_process.execFile()` or `spawn()` with an argument array.
+- For MongoDB/Mongoose, never pass unvalidated request objects directly into queries (e.g. `User.find(req.body)` allows `{ $gt: "" }` authentication bypass). Sanitize inputs with `mongo-sanitize`.
+
+## 3. Prototype Pollution
+- Protect against prototype pollution attacks by validating JSON object keys (block `__proto__`, `constructor`, `prototype`).
+- Use `Object.create(null)` for pure key-value dictionaries or use `Map`.
+- Freeze sensitive shared prototypes with `Object.freeze(Object.prototype)`.
+
+## 4. Sensitive Data Exposure & Tokens
+- Store authentication tokens (JWTs) in `HttpOnly`, `Secure`, `SameSite=Strict` cookies rather than `localStorage` or `sessionStorage` to mitigate token theft via XSS.
+- Never log passwords, payment card details, or authorization tokens to server logs or browser console.

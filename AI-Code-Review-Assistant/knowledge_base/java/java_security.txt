@@ -1,0 +1,20 @@
+# Java Security Guidelines & OWASP Mitigation
+
+## 1. SQL Injection & PreparedStatement
+- Never concatenate strings to build SQL queries.
+- Always use `PreparedStatement` with parameterized placeholders (`?`) or use secure ORMs like Hibernate/JPA with parameterized HQL/JPQL.
+
+## 2. Insecure Deserialization
+- Avoid native Java serialization (`Serializable`, `ObjectInputStream.readObject()`) from untrusted networks.
+- If serialization is required, implement a strict `ObjectInputFilter` whitelist or migrate to JSON / Protocol Buffers.
+
+## 3. Cryptography & Password Hashing
+- Never store plaintext passwords. Use strong, salted adaptive hashing algorithms such as Argon2id or BCrypt (`BCryptPasswordEncoder`).
+- Avoid deprecated or broken algorithms like MD5, SHA-1, DES, or 3DES. Use AES-256 in GCM mode (Galois/Counter Mode) for symmetric encryption.
+- Always use `SecureRandom` instead of `java.util.Random` for cryptographic tokens, session identifiers, and nonces.
+
+## 4. XML External Entity (XXE) Prevention
+- Disable external DTDs and entities when parsing XML files with `DocumentBuilderFactory` or `SAXParserFactory`:
+  ```java
+  factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+  ```

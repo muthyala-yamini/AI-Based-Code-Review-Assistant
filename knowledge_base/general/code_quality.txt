@@ -1,0 +1,20 @@
+# Code Quality, Architecture & Maintainability Metrics
+
+## 1. Cyclomatic Complexity
+- Cyclomatic complexity measures the number of linearly independent paths through a program's source code.
+- Target complexity: Keep individual function cyclomatic complexity under 10.
+- Functions with complexity > 15 must be broken down into cohesive helper functions.
+
+## 2. DRY & Clean Code (Don't Repeat Yourself)
+- Extract duplicated algorithms and calculations into reusable, single-responsibility functions.
+- Avoid "magic numbers" or hardcoded literal strings. Extract them into named constants or configuration objects.
+- Functions should do one thing, do it well, and do it only. Keep functions under 30-40 lines.
+
+## 3. Cohesion and Coupling
+- High cohesion: A module or class should have a single well-defined purpose.
+- Low coupling: Minimize dependencies between components; use dependency injection and abstract interfaces to decouple modules.
+
+## 4. Code Smells
+- Long Method: Break into smaller, well-named units.
+- God Class: Violates Single Responsibility Principle; split into focused collaborator classes.
+- Primitive Obsession: Prefer domain value objects (e.g. `EmailAddress`, `CurrencyAmount`) instead of raw strings and floats.

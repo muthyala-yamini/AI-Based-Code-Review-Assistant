@@ -1,0 +1,19 @@
+# Core Framework
+Flask>=3.0.0
+Werkzeug>=3.0.0
+python-dotenv>=1.0.0
+
+# AI & Gemini SDK
+google-genai>=1.0.0
+
+# Multi-Agent Workflow
+langgraph>=0.2.0
+langchain-core>=0.3.0
+
+# RAG & Vector Search
+faiss-cpu>=1.8.0
+sentence-transformers>=3.0.0
+numpy>=1.26.0
+
+# Utilities
+requests>=2.31.0

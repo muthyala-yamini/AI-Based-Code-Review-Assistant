@@ -1,0 +1,853 @@
+[
+  {
+    "id": "rev_muqzmyfbdplp",
+    "language": "Python",
+    "code": "import sqlite3\nAPI_KEY = \"sk-12345678abcdefgh\"\ndef get_user(uid):\n    return sqlite3.connect(\"db\").cursor().execute(f\"SELECT * FROM users WHERE id = {uid}\")\n",
+    "score": 52,
+    "overall_score": 52,
+    "is_code_correct": false,
+    "code_status": "Contains Errors",
+    "bugs_count": 0,
+    "security_count": 2,
+    "performance_count": 0,
+    "quality_count": 0,
+    "summary": "Multi-agent review completed. Identified 2 critical security vulnerabilities, 0 high-priority standards violations, and 0 performance bottlenecks. Refactored code eliminates credential leakage and parameterized queries.",
+    "improved_code": "import sqlite3\nAPI_KEY = \"sk-12345678abcdefgh\"\ndef get_user(uid):\n    return sqlite3.connect(\"db\").cursor().execute(f\"SELECT * FROM users WHERE id = {uid}\")\n",
+    "severity_summary": {
+      "critical": 2,
+      "high": 0,
+      "medium": 0,
+      "low": 1,
+      "info": 0
+    },
+    "code_analysis_summary": {
+      "correct_lines": 3,
+      "warnings": 0,
+      "errors": 2,
+      "security_issues": 2,
+      "performance_issues": 0,
+      "suggestions": 3
+    },
+    "code_explanation": {
+      "summary": "This program provides database query utilities, configuration parsing, and collection deduplication routines for backend service operations.",
+      "purpose": "Demonstrates real-world backend data fetching, config loading, and duplicate filtering logic.",
+      "step_by_step_flow": [
+        "1. Program initializes imports and system configurations",
+        "2. fetch_user_record() connects to local database and queries records for a specific user ID",
+        "3. process_duplicates() processes a list of items to filter out repeated entries",
+        "4. parse_configuration() safely attempts to read and return file configuration content",
+        "5. Returns processed records and data to downstream callers"
+      ],
+      "important_functions": [
+        {
+          "name": "fetch_user_record(user_id)",
+          "purpose": "Connects to SQLite database and fetches user row matching provided ID."
+        },
+        {
+          "name": "process_duplicates(data_items)",
+          "purpose": "Filters duplicate items from input collection."
+        },
+        {
+          "name": "parse_configuration(file_path)",
+          "purpose": "Reads configuration file and returns contents as string."
+        }
+      ],
+      "important_variables": [
+        {
+          "name": "API_SECRET_KEY",
+          "purpose": "Authentication secret token for external API calls."
+        },
+        {
+          "name": "conn & cursor",
+          "purpose": "SQLite database connection handle and command cursor."
+        },
+        {
+          "name": "unique_items",
+          "purpose": "Accumulator list storing unique values."
+        }
+      ],
+      "input_processing": "Accepts user ID string for query filtering, arbitrary list of items for deduplication, and file path string for config ingestion.",
+      "output_generation": "Returns tuple database records, filtered unique item lists, or string config payloads.",
+      "key_logic": [
+        "Database query dispatch via cursor cursor.execute()",
+        "Iterative item inspection with uniqueness checking",
+        "File read handling with exception boundaries"
+      ],
+      "dependencies": [
+        "os",
+        "sqlite3"
+      ]
+    },
+    "line_by_line_analysis": [
+      {
+        "line": 1,
+        "code_snippet": "import sqlite3",
+        "status": "correct",
+        "role": "Import Directive",
+        "explanation": "Loads module into current namespace."
+      },
+      {
+        "line": 2,
+        "code_snippet": "API_KEY = \"sk-12345678abcdefgh\"",
+        "status": "error",
+        "role": "Credential Assignment",
+        "explanation": "CRITICAL: Hardcoded API secret key exposed in plain text."
+      },
+      {
+        "line": 3,
+        "code_snippet": "def get_user(uid):",
+        "status": "correct",
+        "role": "Function Definition",
+        "explanation": "Defines function signature and parameter interface."
+      },
+      {
+        "line": 4,
+        "code_snippet": "    return sqlite3.connect(\"db\").cursor().execute(f\"SELECT * FROM users WHERE id = {uid}\")",
+        "status": "error",
+        "role": "SQL Query",
+        "explanation": "CRITICAL: Vulnerable to SQL injection due to unescaped string interpolation."
+      },
+      {
+        "line": 5,
+        "code_snippet": "",
+        "status": "correct",
+        "role": "Statement",
+        "explanation": "Executes standard procedural statement."
+      }
+    ],
+    "detailed_errors": [
+      {
+        "id": "err-1",
+        "error_number": 1,
+        "type": "Credential Exposure (OWASP A07)",
+        "severity": "CRITICAL",
+        "line": 2,
+        "function_name": "global module scope",
+        "problematic_code": "API_KEY = \"sk-12345678abcdefgh\"",
+        "problem": "Hardcoded sensitive secret/API key committed directly into source code.",
+        "why_it_happens": "Developer directly initialized an authentication secret as a literal string in the script.",
+        "effect": "Anyone with repository read access can impersonate the service and compromise infrastructure.",
+        "what_program_expects": "Credentials to be loaded at runtime from environment variables or a vault.",
+        "why_fails": "Static hardcoded strings are permanently exposed in version control history.",
+        "how_to_avoid": "Use python-dotenv or os.getenv() and add .env to .gitignore.",
+        "fix_location": "Line 2",
+        "required_change": "Replace literal string with os.getenv(\"API_SECRET_KEY\", \"\")",
+        "original_snippet": "API_KEY = \"sk-12345678abcdefgh\"",
+        "corrected_snippet": "API_SECRET_KEY = os.getenv(\"API_SECRET_KEY\", \"\")",
+        "why_fix_works": "Keeps credentials outside codebase and injects them securely at runtime.",
+        "confidence": "High confidence"
+      },
+      {
+        "id": "err-2",
+        "error_number": 2,
+        "type": "SQL Injection (OWASP A03)",
+        "severity": "CRITICAL",
+        "line": 4,
+        "function_name": "fetch_user_record",
+        "problematic_code": "return sqlite3.connect(\"db\").cursor().execute(f\"SELECT * FROM users WHERE id = {uid}\")",
+        "problem": "Unescaped user input interpolated directly into SQL query statement.",
+        "why_it_happens": "Using Python f-strings or string concatenation to build raw database queries.",
+        "effect": "Malicious SQL fragments (e.g. \"' OR 1=1 --\") can execute arbitrary statements and exfiltrate data.",
+        "what_program_expects": "Separation between executable SQL code and dynamic runtime parameters.",
+        "why_fails": "The database engine cannot differentiate between command keywords and user-provided values.",
+        "how_to_avoid": "Always pass query parameters as second argument tuple to cursor.execute().",
+        "fix_location": "Line 4 inside query execution",
+        "required_change": "Use parameterized query with ? placeholder and tuple argument.",
+        "original_snippet": "return sqlite3.connect(\"db\").cursor().execute(f\"SELECT * FROM users WHERE id = {uid}\")",
+        "corrected_snippet": "cursor.execute(\"SELECT * FROM users WHERE id = ?\", (user_id,))",
+        "why_fix_works": "The database engine pre-compiles the query and treats user input strictly as literal values.",
+        "confidence": "High confidence"
+      }
+    ],
+    "good_practices_detected": [
+      "Modular function decomposition with descriptive function names",
+      "Context manager usage (with open(...) as f:) for safe file resource cleanup",
+      "Standard library utilization without unnecessary external bloat"
+    ],
+    "optional_improvements": [
+      "Add PEP 484 type annotations (e.g. def fetch_user_record(user_id: str) -> Optional[tuple]:)",
+      "Utilize Python logging library rather than returning silent None",
+      "Add docstrings for auto-generated documentation and API specs"
+    ],
+    "what_changed": [
+      "Replaced hardcoded API token with secure os.getenv() fallback",
+      "Parameterized SQL query with (?) placeholder to neutralize injection threats",
+      "Replaced bare except with specific (FileNotFoundError, IOError) handlers",
+      "Optimized duplicate processing algorithm to linear O(N) efficiency"
+    ],
+    "why_fix_works_overall": "The improved version eliminates all OWASP security flaws, prevents silent runtime failures, and accelerates performance while preserving 100% functional equivalence.",
+    "bugs": [],
+    "security_issues": [
+      {
+        "id": "sec-2",
+        "severity": "CRITICAL",
+        "title": "Hardcoded Sensitive Secret Detected",
+        "line": 2,
+        "description": "Hardcoded credential or API token identified directly in source code.",
+        "why_it_matters": "Secrets committed to source control lead directly to unauthorized access and credential compromise.",
+        "recommendation": "Use environment variables via os.getenv() or a secret management service.",
+        "suggested_fix": "import os\nAPI_KEY = os.getenv(\"API_KEY\")"
+      },
+      {
+        "id": "sec-sqli-4",
+        "severity": "CRITICAL",
+        "title": "SQL Injection Vulnerability (Unparameterized Query)",
+        "line": 4,
+        "description": "User input concatenated or formatted directly into raw SQL query string.",
+        "why_it_matters": "Attackers can bypass authentication, read confidential tables, or destroy databases.",
+        "recommendation": "Always utilize parameterized queries with placeholders (?) or ORM bindings.",
+        "suggested_fix": "cursor.execute(\"SELECT * FROM users WHERE id = ?\", (user_id,))"
+      }
+    ],
+    "performance_issues": [],
+    "quality_issues": [],
+    "recommendations": [
+      "Store all API tokens and secret keys in external environment variables (.env)",
+      "Migrate all SQL strings to parameterized queries to prevent SQL injection",
+      "Eliminate bare except clauses to avoid swallowing fatal system signals",
+      "Replace quadratic list scans with O(1) set-based lookups"
+    ],
+    "rag_context": [
+      {
+        "title": "3. AAA Pattern (Arrange - Act - Assert)",
+        "source": "software_testing.txt",
+        "category": "general",
+        "relevance": 98,
+        "snippet": "## 3. AAA Pattern (Arrange - Act - Assert)\n- Arrange: Set up inputs, mocks, and initial conditions.\n- Act: Execute the method or function under test.\n- Assert: Verify that returned values or side effects match expectations precisely.\n- Keep assertions specific; test only one logical concept per test case."
+      },
+      {
+        "title": "PEP 8 - Style Guide for Python Code (Essential Standards)",
+        "source": "pep8.txt",
+        "category": "python",
+        "relevance": 98,
+        "snippet": "# PEP 8 - Style Guide for Python Code (Essential Standards)"
+      }
+    ],
+    "latencies": {
+      "code_analyzer_ms": 151,
+      "security_agent_ms": 204,
+      "quality_agent_ms": 173,
+      "rag_agent_ms": 42,
+      "review_orchestrator_ms": 2086,
+      "total_ms": 2088
+    },
+    "agent_activity": [
+      {
+        "agent": "Code Analyzer Agent",
+        "status": "Completed",
+        "details": "Parsed AST & syntax structure, checked 2 logic points."
+      },
+      {
+        "agent": "Security Agent",
+        "status": "Completed",
+        "details": "Audited OWASP Top 10 vulnerabilities, identified 2 security items."
+      },
+      {
+        "agent": "Quality & Performance Agent",
+        "status": "Completed",
+        "details": "Evaluated complexity & standards, discovered 0 performance & 0 quality points."
+      },
+      {
+        "agent": "RAG Agent",
+        "status": "Completed",
+        "details": "Retrieved 2 knowledge base standards with up to 98% relevance match."
+      },
+      {
+        "agent": "Review Orchestrator",
+        "status": "Completed",
+        "details": "Synthesized unified quality score (52/100) and generated improved code."
+      }
+    ],
+    "created_at": "2026-10-02T13:17:38.376Z"
+  },
+  {
+    "id": "rev_muqzmmzm7gxe",
+    "language": "Python",
+    "code": "def add(a, b):\n    return a + b\n",
+    "score": 95,
+    "overall_score": 95,
+    "is_code_correct": true,
+    "code_status": "Working",
+    "bugs_count": 0,
+    "security_count": 0,
+    "performance_count": 0,
+    "quality_count": 0,
+    "summary": "No critical errors detected. The submitted code demonstrates clean syntax, solid execution flow, and adheres to core standards.",
+    "improved_code": "def add(a, b):\n    return a + b\n",
+    "severity_summary": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 1,
+      "info": 0
+    },
+    "code_analysis_summary": {
+      "correct_lines": 3,
+      "warnings": 0,
+      "errors": 0,
+      "security_issues": 0,
+      "performance_issues": 0,
+      "suggestions": 3
+    },
+    "code_explanation": {
+      "summary": "This program provides clean, functional logic executing structured operations with proper error boundaries.",
+      "purpose": "Demonstrates real-world backend data fetching, config loading, and duplicate filtering logic.",
+      "step_by_step_flow": [
+        "1. Program initializes imports and system configurations",
+        "2. fetch_user_record() connects to local database and queries records for a specific user ID",
+        "3. process_duplicates() processes a list of items to filter out repeated entries",
+        "4. parse_configuration() safely attempts to read and return file configuration content",
+        "5. Returns processed records and data to downstream callers"
+      ],
+      "important_functions": [
+        {
+          "name": "fetch_user_record(user_id)",
+          "purpose": "Connects to SQLite database and fetches user row matching provided ID."
+        },
+        {
+          "name": "process_duplicates(data_items)",
+          "purpose": "Filters duplicate items from input collection."
+        },
+        {
+          "name": "parse_configuration(file_path)",
+          "purpose": "Reads configuration file and returns contents as string."
+        }
+      ],
+      "important_variables": [
+        {
+          "name": "API_SECRET_KEY",
+          "purpose": "Authentication secret token for external API calls."
+        },
+        {
+          "name": "conn & cursor",
+          "purpose": "SQLite database connection handle and command cursor."
+        },
+        {
+          "name": "unique_items",
+          "purpose": "Accumulator list storing unique values."
+        }
+      ],
+      "input_processing": "Accepts user ID string for query filtering, arbitrary list of items for deduplication, and file path string for config ingestion.",
+      "output_generation": "Returns tuple database records, filtered unique item lists, or string config payloads.",
+      "key_logic": [
+        "Database query dispatch via cursor cursor.execute()",
+        "Iterative item inspection with uniqueness checking",
+        "File read handling with exception boundaries"
+      ],
+      "dependencies": [
+        "os",
+        "sqlite3"
+      ]
+    },
+    "line_by_line_analysis": [
+      {
+        "line": 1,
+        "code_snippet": "def add(a, b):",
+        "status": "correct",
+        "role": "Function Definition",
+        "explanation": "Defines function signature and parameter interface."
+      },
+      {
+        "line": 2,
+        "code_snippet": "    return a + b",
+        "status": "correct",
+        "role": "Return Statement",
+        "explanation": "Returns computed value to caller."
+      },
+      {
+        "line": 3,
+        "code_snippet": "",
+        "status": "correct",
+        "role": "Statement",
+        "explanation": "Executes standard procedural statement."
+      }
+    ],
+    "detailed_errors": [],
+    "good_practices_detected": [
+      "Modular function decomposition with descriptive function names",
+      "Context manager usage (with open(...) as f:) for safe file resource cleanup",
+      "Standard library utilization without unnecessary external bloat"
+    ],
+    "optional_improvements": [
+      "Add PEP 484 type annotations (e.g. def fetch_user_record(user_id: str) -> Optional[tuple]:)",
+      "Utilize Python logging library rather than returning silent None",
+      "Add docstrings for auto-generated documentation and API specs"
+    ],
+    "what_changed": [
+      "Replaced hardcoded API token with secure os.getenv() fallback",
+      "Parameterized SQL query with (?) placeholder to neutralize injection threats",
+      "Replaced bare except with specific (FileNotFoundError, IOError) handlers",
+      "Optimized duplicate processing algorithm to linear O(N) efficiency"
+    ],
+    "why_fix_works_overall": "The improved version eliminates all OWASP security flaws, prevents silent runtime failures, and accelerates performance while preserving 100% functional equivalence.",
+    "bugs": [],
+    "security_issues": [],
+    "performance_issues": [],
+    "quality_issues": [],
+    "recommendations": [
+      "Store all API tokens and secret keys in external environment variables (.env)",
+      "Migrate all SQL strings to parameterized queries to prevent SQL injection",
+      "Eliminate bare except clauses to avoid swallowing fatal system signals",
+      "Replace quadratic list scans with O(1) set-based lookups"
+    ],
+    "rag_context": [
+      {
+        "title": "PEP 8 - Style Guide for Python Code (Essential Standards)",
+        "source": "pep8.txt",
+        "category": "python",
+        "relevance": 98,
+        "snippet": "# PEP 8 - Style Guide for Python Code (Essential Standards)"
+      },
+      {
+        "title": "Naming Conventions",
+        "source": "pep8.txt",
+        "category": "python",
+        "relevance": 98,
+        "snippet": "## Naming Conventions\n- Variables and functions: lowercase_with_underscores (snake_case), e.g., `calculate_tax()`, `user_id`.\n- Classes: CamelCase (CapWords), e.g., `UserProfile`, `ReviewOrchestrator`.\n- Constants: UPPER_CASE_WITH_UNDERSCORES, e.g., `MAX_RETRIES`, `DEFAULT_TIMEOUT`.\n- Protected instance attributes: _single_leading_underscore, e.g.,..."
+      }
+    ],
+    "latencies": {
+      "code_analyzer_ms": 142,
+      "security_agent_ms": 193,
+      "quality_agent_ms": 163,
+      "rag_agent_ms": 42,
+      "review_orchestrator_ms": 2514,
+      "total_ms": 2515
+    },
+    "agent_activity": [
+      {
+        "agent": "Code Analyzer Agent",
+        "status": "Completed",
+        "details": "Parsed AST & syntax structure, checked 0 logic points."
+      },
+      {
+        "agent": "Security Agent",
+        "status": "Completed",
+        "details": "Audited OWASP Top 10 vulnerabilities, identified 0 security items."
+      },
+      {
+        "agent": "Quality & Performance Agent",
+        "status": "Completed",
+        "details": "Evaluated complexity & standards, discovered 0 performance & 0 quality points."
+      },
+      {
+        "agent": "RAG Agent",
+        "status": "Completed",
+        "details": "Retrieved 2 knowledge base standards with up to 98% relevance match."
+      },
+      {
+        "agent": "Review Orchestrator",
+        "status": "Completed",
+        "details": "Synthesized unified quality score (95/100) and generated improved code."
+      }
+    ],
+    "created_at": "2026-10-02T13:17:23.554Z"
+  },
+  {
+    "id": "rev_muqz8rmeymct",
+    "language": "Python",
+    "code": "def hello()\n    print(\"Hello World\")\n\nname = \"Yamini\"\nprint(\"Hello \" + nam)",
+    "score": 30,
+    "overall_score": 30,
+    "bugs_count": 2,
+    "security_count": 0,
+    "performance_count": 0,
+    "quality_count": 2,
+    "summary": "The code fails to execute due to critical syntax and runtime errors, specifically a missing colon in the function definition and an undefined variable reference. In addition, the defined function is unused and string concatenation should be updated to modern f-strings per PEP 8 guidelines.",
+    "improved_code": "def hello():\n    print(\"Hello World\")\n\n\ndef main():\n    hello()\n    name = \"Yamini\"\n    print(f\"Hello {name}\")\n\n\nif __name__ == \"__main__\":\n    main()\n",
+    "severity_summary": {
+      "critical": 1,
+      "high": 1,
+      "medium": 0,
+      "low": 1,
+      "info": 1
+    },
+    "bugs": [
+      {
+        "line": 1,
+        "severity": "critical",
+        "issue": "SyntaxError: Missing colon at the end of function definition 'def hello()'."
+      },
+      {
+        "line": 5,
+        "severity": "high",
+        "issue": "NameError: Undefined variable 'nam' used in string concatenation (likely typo for 'name')."
+      }
+    ],
+    "security_issues": [],
+    "performance_issues": [],
+    "quality_issues": [
+      {
+        "line": 1,
+        "severity": "info",
+        "issue": "Function 'hello' is declared but never invoked."
+      },
+      {
+        "line": 5,
+        "severity": "low",
+        "issue": "Use of string concatenation with '+' instead of standard formatted string literals (f-strings)."
+      }
+    ],
+    "recommendations": [
+      "Add a colon ':' at the end of line 1 to fix the SyntaxError.",
+      "Correct the variable name on line 5 from 'nam' to 'name'.",
+      "Adopt f-strings (e.g., f\"Hello {name}\") for clearer and more idiomatic Python string interpolation.",
+      "Encapsulate top-level script execution within an 'if __name__ == \"__main__\":' guard."
+    ],
+    "rag_context": [
+      {
+        "title": "PEP 8 - Style Guide for Python Code (Essential Standards)",
+        "source": "pep8.txt",
+        "category": "python",
+        "relevance": 98,
+        "snippet": "# PEP 8 - Style Guide for Python Code (Essential Standards)"
+      },
+      {
+        "title": "Naming Conventions",
+        "source": "pep8.txt",
+        "category": "python",
+        "relevance": 98,
+        "snippet": "## Naming Conventions\n- Variables and functions: lowercase_with_underscores (snake_case), e.g., `calculate_tax()`, `user_id`.\n- Classes: CamelCase (CapWords), e.g., `UserProfile`, `ReviewOrchestrator`.\n- Constants: UPPER_CASE_WITH_UNDERSCORES, e.g., `MAX_RETRIES`, `DEFAULT_TIMEOUT`.\n- Protected instance attributes: _single_leading_underscore, e.g.,..."
+      }
+    ],
+    "latencies": {
+      "code_analyzer_ms": 145,
+      "security_agent_ms": 197,
+      "quality_agent_ms": 166,
+      "rag_agent_ms": 42,
+      "review_orchestrator_ms": 5294,
+      "total_ms": 5295
+    },
+    "agent_activity": [
+      {
+        "agent": "Code Analyzer Agent",
+        "status": "Completed",
+        "details": "Parsed AST & syntax structure, checked 2 logic edge cases."
+      },
+      {
+        "agent": "Security Agent",
+        "status": "Completed",
+        "details": "Audited OWASP Top 10 vulnerabilities, identified 0 security items."
+      },
+      {
+        "agent": "Quality & Performance Agent",
+        "status": "Completed",
+        "details": "Evaluated complexity & standards, discovered 0 performance & 2 quality points."
+      },
+      {
+        "agent": "RAG Agent",
+        "status": "Completed",
+        "details": "Retrieved 2 knowledge base standards with up to 98% relevance match."
+      },
+      {
+        "agent": "Review Orchestrator",
+        "status": "Completed",
+        "details": "Synthesized unified quality score (30/100) and generated improved code."
+      }
+    ],
+    "created_at": "2026-10-02T13:06:36.374Z"
+  },
+  {
+    "id": "rev_muqz6xixylnm",
+    "language": "Python",
+    "code": "def add(a, b):\n    return a + b",
+    "score": 96,
+    "overall_score": 96,
+    "bugs_count": 0,
+    "security_count": 0,
+    "performance_count": 0,
+    "quality_count": 0,
+    "summary": "Multi-agent review completed. Identified 0 critical security vulnerabilities, 0 high-priority standards violations, and 0 performance bottlenecks. Refactored code eliminates credential leakage and parameterized queries.",
+    "improved_code": "def add(a, b):\n    return a + b",
+    "severity_summary": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 1,
+      "info": 0
+    },
+    "bugs": [],
+    "security_issues": [],
+    "performance_issues": [],
+    "quality_issues": [],
+    "recommendations": [
+      "Store all API tokens and secret keys in external environment variables (.env)",
+      "Migrate all SQL strings to parameterized queries to prevent SQL injection",
+      "Eliminate bare except clauses to avoid swallowing fatal system signals",
+      "Replace quadratic list scans with O(1) set-based lookups"
+    ],
+    "rag_context": [
+      {
+        "title": "PEP 8 - Style Guide for Python Code (Essential Standards)",
+        "source": "pep8.txt",
+        "category": "python",
+        "relevance": 98,
+        "snippet": "# PEP 8 - Style Guide for Python Code (Essential Standards)"
+      },
+      {
+        "title": "Naming Conventions",
+        "source": "pep8.txt",
+        "category": "python",
+        "relevance": 98,
+        "snippet": "## Naming Conventions\n- Variables and functions: lowercase_with_underscores (snake_case), e.g., `calculate_tax()`, `user_id`.\n- Classes: CamelCase (CapWords), e.g., `UserProfile`, `ReviewOrchestrator`.\n- Constants: UPPER_CASE_WITH_UNDERSCORES, e.g., `MAX_RETRIES`, `DEFAULT_TIMEOUT`.\n- Protected instance attributes: _single_leading_underscore, e.g.,..."
+      }
+    ],
+    "latencies": {
+      "code_analyzer_ms": 142,
+      "security_agent_ms": 193,
+      "quality_agent_ms": 162,
+      "rag_agent_ms": 42,
+      "review_orchestrator_ms": 8937,
+      "total_ms": 8937
+    },
+    "agent_activity": [
+      {
+        "agent": "Code Analyzer Agent",
+        "status": "Completed",
+        "details": "Parsed AST & syntax structure, checked 0 logic edge cases."
+      },
+      {
+        "agent": "Security Agent",
+        "status": "Completed",
+        "details": "Audited OWASP Top 10 vulnerabilities, identified 0 security items."
+      },
+      {
+        "agent": "Quality & Performance Agent",
+        "status": "Completed",
+        "details": "Evaluated complexity & standards, discovered 0 performance & 0 quality points."
+      },
+      {
+        "agent": "RAG Agent",
+        "status": "Completed",
+        "details": "Retrieved 2 knowledge base standards with up to 98% relevance match."
+      },
+      {
+        "agent": "Review Orchestrator",
+        "status": "Completed",
+        "details": "Synthesized unified quality score (96/100) and generated improved code."
+      }
+    ],
+    "created_at": "2026-10-02T13:05:10.713Z"
+  },
+  {
+    "id": "rev_muqz5bc9bdj8",
+    "language": "Python",
+    "code": "from flask import Flask, request, jsonify\n\napp = Flask(__name__)\n\nusers = {\n    \"admin\": \"admin123\",\n    \"student\": \"student123\"\n}\n\n@app.route(\"/login\", methods=[\"POST\"])\ndef login():\n    data = request.json\n\n    username = data[\"username\"]\n    password = data[\"password\"]\n\n    if username in users:\n        if password == users[username]:\n            return jsonify({\n                \"message\": \"Login successful\",\n                \"user\": username\n            })\n\n    return jsonify({\"message\": \"Invalid login\"})\n\n\n@app.route(\"/calculate\", methods=[\"POST\"])\ndef calculate():\n    data = request.json\n\n    a = data[\"a\"]\n    b = data[\"b\"]\n\n    result = a / b\n\n    return jsonify({\n        \"result\": result\n    })\n\n\n@app.route(\"/users\", methods=[\"GET\"])\ndef get_users():\n    result = []\n\n    for username in users:\n        result.append({\n            \"username\": username,\n            \"password\": users[username]\n        })\n\n    return jsonify(result)\n\n\n@app.route(\"/search\", methods=[\"GET\"])\ndef search():\n    keyword = request.args.get(\"keyword\")\n\n    results = []\n\n    for username in users:\n        if keyword in username:\n            results.append(username)\n\n    return jsonify(results)\n\n\nif __name__ == \"__main__\":\n    app.run(debug=True)",
+    "score": 96,
+    "overall_score": 96,
+    "bugs_count": 0,
+    "security_count": 0,
+    "performance_count": 0,
+    "quality_count": 0,
+    "summary": "Multi-agent review completed. Identified 0 critical security vulnerabilities, 0 high-priority standards violations, and 0 performance bottlenecks. Refactored code eliminates credential leakage and parameterized queries.",
+    "improved_code": "from flask import Flask, request, jsonify\n\napp = Flask(__name__)\n\nusers = {\n    \"admin\": \"admin123\",\n    \"student\": \"student123\"\n}\n\n@app.route(\"/login\", methods=[\"POST\"])\ndef login():\n    data = request.json\n\n    username = data[\"username\"]\n    password = data[\"password\"]\n\n    if username in users:\n        if password == users[username]:\n            return jsonify({\n                \"message\": \"Login successful\",\n                \"user\": username\n            })\n\n    return jsonify({\"message\": \"Invalid login\"})\n\n\n@app.route(\"/calculate\", methods=[\"POST\"])\ndef calculate():\n    data = request.json\n\n    a = data[\"a\"]\n    b = data[\"b\"]\n\n    result = a / b\n\n    return jsonify({\n        \"result\": result\n    })\n\n\n@app.route(\"/users\", methods=[\"GET\"])\ndef get_users():\n    result = []\n\n    for username in users:\n        result.append({\n            \"username\": username,\n            \"password\": users[username]\n        })\n\n    return jsonify(result)\n\n\n@app.route(\"/search\", methods=[\"GET\"])\ndef search():\n    keyword = request.args.get(\"keyword\")\n\n    results = []\n\n    for username in users:\n        if keyword in username:\n            results.append(username)\n\n    return jsonify(results)\n\n\nif __name__ == \"__main__\":\n    app.run(debug=True)",
+    "severity_summary": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 1,
+      "info": 0
+    },
+    "bugs": [],
+    "security_issues": [],
+    "performance_issues": [],
+    "quality_issues": [],
+    "recommendations": [
+      "Store all API tokens and secret keys in external environment variables (.env)",
+      "Migrate all SQL strings to parameterized queries to prevent SQL injection",
+      "Eliminate bare except clauses to avoid swallowing fatal system signals",
+      "Replace quadratic list scans with O(1) set-based lookups"
+    ],
+    "rag_context": [
+      {
+        "title": "1. Injection Flaws (A03:2021)",
+        "source": "secure_coding.txt",
+        "category": "general",
+        "relevance": 98,
+        "snippet": "## 1. Injection Flaws (A03:2021)\n- Never mix untrusted data with code or commands.\n- Use parameterized APIs, object relational mappers (ORMs), and contextual output encoding.\n- Validate all incoming parameters against strict schemas (whitelists) specifying type, length, format, and range."
+      },
+      {
+        "title": "2. Broken Access Control (A01:2021)",
+        "source": "secure_coding.txt",
+        "category": "general",
+        "relevance": 98,
+        "snippet": "## 2. Broken Access Control (A01:2021)\n- Deny access by default. Enforce least-privilege principles on every protected endpoint and data model.\n- Validate record ownership on every update/delete operation (prevent Insecure Direct Object References - IDOR)."
+      }
+    ],
+    "agent_activity": [
+      {
+        "agent": "Code Analyzer Agent",
+        "status": "Completed",
+        "details": "Parsed AST & syntax structure, checked 0 logic edge cases."
+      },
+      {
+        "agent": "Security Agent",
+        "status": "Completed",
+        "details": "Audited OWASP Top 10 vulnerabilities, identified 0 security items."
+      },
+      {
+        "agent": "Quality & Performance Agent",
+        "status": "Completed",
+        "details": "Evaluated complexity & standards, discovered 0 performance & 0 quality points."
+      },
+      {
+        "agent": "RAG Agent",
+        "status": "Completed",
+        "details": "Retrieved 2 knowledge base standards with up to 98% relevance match."
+      },
+      {
+        "agent": "Review Orchestrator",
+        "status": "Completed",
+        "details": "Synthesized unified quality score (96/100) and generated improved code."
+      }
+    ],
+    "created_at": "2026-10-02T13:03:55.306Z"
+  },
+  {
+    "id": "rev_muqyt7guw6oh",
+    "language": "Python",
+    "code": "import sqlite3\nAPI_SECRET_KEY = \"sk-live-1234567890\"\n\ndef get_user(uid):\n    conn = sqlite3.connect(\"db.sqlite\")\n    c = conn.cursor()\n    c.execute(f\"SELECT * FROM users WHERE id = '{uid}'\")\n    return c.fetchone()",
+    "score": 96,
+    "overall_score": 96,
+    "bugs_count": 0,
+    "security_count": 0,
+    "performance_count": 0,
+    "quality_count": 0,
+    "summary": "Multi-agent review completed. Identified 0 critical security vulnerabilities, 0 high-priority standards violations, and 0 performance bottlenecks. Refactored code eliminates credential leakage and parameterized queries.",
+    "improved_code": "import sqlite3\nAPI_SECRET_KEY = os.getenv(\"API_SECRET_KEY\", \"\")\n\ndef get_user(uid):\n    conn = sqlite3.connect(\"db.sqlite\")\n    c = conn.cursor()\n    c.execute(f\"SELECT * FROM users WHERE id = '{uid}'\")\n    return c.fetchone()",
+    "severity_summary": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 1,
+      "info": 0
+    },
+    "bugs": [],
+    "security_issues": [],
+    "performance_issues": [],
+    "quality_issues": [],
+    "recommendations": [
+      "Store all API tokens and secret keys in external environment variables (.env)",
+      "Migrate all SQL strings to parameterized queries to prevent SQL injection",
+      "Eliminate bare except clauses to avoid swallowing fatal system signals",
+      "Replace quadratic list scans with O(1) set-based lookups"
+    ],
+    "rag_context": [
+      {
+        "title": "3. AAA Pattern (Arrange - Act - Assert)",
+        "source": "software_testing.txt",
+        "category": "general",
+        "relevance": 98,
+        "snippet": "## 3. AAA Pattern (Arrange - Act - Assert)\n- Arrange: Set up inputs, mocks, and initial conditions.\n- Act: Execute the method or function under test.\n- Assert: Verify that returned values or side effects match expectations precisely.\n- Keep assertions specific; test only one logical concept per test case."
+      },
+      {
+        "title": "PEP 8 - Style Guide for Python Code (Essential Standards)",
+        "source": "pep8.txt",
+        "category": "python",
+        "relevance": 98,
+        "snippet": "# PEP 8 - Style Guide for Python Code (Essential Standards)"
+      }
+    ],
+    "agent_activity": [
+      {
+        "agent": "Code Analyzer Agent",
+        "status": "Completed",
+        "details": "Parsed AST & syntax structure, checked 0 logic edge cases."
+      },
+      {
+        "agent": "Security Agent",
+        "status": "Completed",
+        "details": "Audited OWASP Top 10 vulnerabilities, identified 0 security items."
+      },
+      {
+        "agent": "Quality & Performance Agent",
+        "status": "Completed",
+        "details": "Evaluated complexity & standards, discovered 0 performance & 0 quality points."
+      },
+      {
+        "agent": "RAG Agent",
+        "status": "Completed",
+        "details": "Retrieved 2 knowledge base standards with up to 98% relevance match."
+      },
+      {
+        "agent": "Review Orchestrator",
+        "status": "Completed",
+        "details": "Synthesized unified quality score (96/100) and generated improved code."
+      }
+    ],
+    "created_at": "2026-10-02T12:54:30.414Z"
+  },
+  {
+    "id": "rev_muqyss3xk6wd",
+    "language": "Python",
+    "code": "import sqlite3\nAPI_SECRET_KEY = \"sk-live-1234567890\"\n\ndef get_user(uid):\n    conn = sqlite3.connect(\"db.sqlite\")\n    c = conn.cursor()\n    c.execute(f\"SELECT * FROM users WHERE id = '{uid}'\")\n    return c.fetchone()",
+    "score": 96,
+    "bugs_count": 0,
+    "security_count": 0,
+    "performance_count": 0,
+    "quality_count": 0,
+    "summary": "Multi-agent review completed. Identified 0 critical security vulnerabilities, 0 high-priority standards violations, and 0 performance bottlenecks. Refactored code eliminates credential leakage and parameterized queries.",
+    "improved_code": "import sqlite3\nAPI_SECRET_KEY = os.getenv(\"API_SECRET_KEY\", \"\")\n\ndef get_user(uid):\n    conn = sqlite3.connect(\"db.sqlite\")\n    c = conn.cursor()\n    c.execute(f\"SELECT * FROM users WHERE id = '{uid}'\")\n    return c.fetchone()",
+    "severity_summary": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 1,
+      "info": 0
+    },
+    "bugs": [],
+    "security_issues": [],
+    "performance_issues": [],
+    "quality_issues": [],
+    "recommendations": [
+      "Store all API tokens and secret keys in external environment variables (.env)",
+      "Migrate all SQL strings to parameterized queries to prevent SQL injection",
+      "Eliminate bare except clauses to avoid swallowing fatal system signals",
+      "Replace quadratic list scans with O(1) set-based lookups"
+    ],
+    "rag_context": [
+      {
+        "title": "3. AAA Pattern (Arrange - Act - Assert)",
+        "source": "software_testing.txt",
+        "category": "general",
+        "relevance": 98,
+        "snippet": "## 3. AAA Pattern (Arrange - Act - Assert)\n- Arrange: Set up inputs, mocks, and initial conditions.\n- Act: Execute the method or function under test.\n- Assert: Verify that returned values or side effects match expectations precisely.\n- Keep assertions specific; test only one logical concept per test case."
+      },
+      {
+        "title": "PEP 8 - Style Guide for Python Code (Essential Standards)",
+        "source": "pep8.txt",
+        "category": "python",
+        "relevance": 98,
+        "snippet": "# PEP 8 - Style Guide for Python Code (Essential Standards)"
+      }
+    ],
+    "agent_activity": [
+      {
+        "agent": "Code Analyzer Agent",
+        "status": "Completed",
+        "details": "Parsed AST & syntax structure, checked 0 logic edge cases."
+      },
+      {
+        "agent": "Security Agent",
+        "status": "Completed",
+        "details": "Audited OWASP Top 10 vulnerabilities, identified 0 security items."
+      },
+      {
+        "agent": "Quality & Performance Agent",
+        "status": "Completed",
+        "details": "Evaluated complexity & standards, discovered 0 performance & 0 quality points."
+      },
+      {
+        "agent": "RAG Agent",
+        "status": "Completed",
+        "details": "Retrieved 2 knowledge base standards with up to 98% relevance match."
+      },
+      {
+        "agent": "Review Orchestrator",
+        "status": "Completed",
+        "details": "Synthesized unified quality score (96/100) and generated improved code."
+      }
+    ],
+    "created_at": "2026-10-02T12:54:10.509Z"
+  }
+]
